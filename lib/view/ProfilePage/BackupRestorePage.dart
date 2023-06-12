@@ -535,12 +535,15 @@ class BackupRestorePageState extends State<BackupRestorePage> {
                     state.listFiles![index].path
                         .split('/')
                         .last,
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
                     style: Theme
                         .of(context)
                         .textTheme
                         .headline6!
                         .copyWith(
-                        fontSize: MinTextSize,
+                        fontSize: 13.0,
                         color: Theme
                             .of(context)
                             .focusColor),
