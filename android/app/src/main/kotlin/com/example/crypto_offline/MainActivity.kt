@@ -1,4 +1,4 @@
-package com.encryptoportfolio.app
+package com.intellisoftalpin.encryptoportfolio
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.plugins.GeneratedPluginRegistrant
