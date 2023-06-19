@@ -59,7 +59,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     bool isSame = false;
     bool isErrorEmpty = false;
     var pass = globals.pass.trim();
-    print("formattedDateCache = $formattedDateCache, formattedDate = $formattedDate"); // 2016-01-25
+    print(
+        "formattedDateCache = $formattedDateCache, formattedDate = $formattedDate"); // 2016-01-25
     try {
       await _prefProfileRepository.delProfile('lastProf');
       print(
@@ -73,7 +74,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       if (pass.isEmpty || pass == '') {
         // profile = await _hiveProfileRepository.showProfile();
         isErrorEmpty = true;
-        yield state.copyWith(ProfileStatus.loading, wallet, profile.toList(), listCoin, isErrorEmpty);
+        yield state.copyWith(ProfileStatus.loading, wallet, profile.toList(),
+            listCoin, isErrorEmpty);
       } else {
         isErrorEmpty = false;
         var internet = await _apiRepository.check();
@@ -112,22 +114,27 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         //profile = await _hiveProfileRepository.showProfile();
 
         if (lastDateCache.isNotEmpty) {
-          wallet = (await getWallet(transactions))!;
-        } else {
           if (internet) {
             wallet = await getWalletApi(transactions);
+          } else {
+            wallet = (await getWallet(transactions))!;
           }
+          listCoin = await getListCoin(internet);
+        } else {
+          wallet = await getWalletApi(transactions);
+          listCoin = await getListCoin(internet);
         }
-        listCoin = await getListCoin(internet);
         print("wallet = $wallet");
         print("listCoin = $listCoin");
         print("22profile = $profile");
-        yield state.copyWith(ProfileStatus.loaded, wallet, profile.toList(), listCoin);
+        yield state.copyWith(
+            ProfileStatus.loaded, wallet, profile.toList(), listCoin);
       }
     } on Exception catch (e) {
       print("coinsListDB new error = $e isErrorEmpty = $isErrorEmpty");
       profile = await _hiveProfileRepository.showProfile();
-      yield state.copyWith(ProfileStatus.loading, wallet, profile.toList(), [], isErrorEmpty);
+      yield state.copyWith(
+          ProfileStatus.loading, wallet, profile.toList(), [], isErrorEmpty);
       throw Exception("Error on coinsListDB");
     }
   }
@@ -208,7 +215,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     return walleted;
   }
 
-  Future<List<ListCoin>> getListCoin( var internet) async {
+  Future<List<ListCoin>> getListCoin(var internet) async {
     double walletInOut = 0;
     double costInOut = 0;
     num priseUsd = 0;
@@ -243,108 +250,108 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               .toList();
         }
       }
-        for (var coin in coinsList) {
-          String id = coin.coinId;
-          if(internet){
-            responseCoinById = await _apiRepository.coinById(id);
-          }
-            if (responseCoinById != null && responseCoinById.statusCode == HttpStatus.ok) {
-              var coinData1 = (jsonDecode(responseCoinById.body));
-              var coinData = CoinModel.fromJson(coinData1);
-              print("!!!!coinData!!!!! = $coinData");
-              id = coinData.id!;
-              symbol = coinData.symbol;
-              name = coinData.name;
-              image = 'https://static.coinpaprika.com/coin/${coinData.id!}/logo.png';
-              priseUsd = coinData.quotes!.uSD!.price!;
-              marketCap = coinData.quotes!.uSD!.marketCap;
-              percentChange24h = coinData.quotes!.uSD!.percentChange24h;
-              percentChange7d = coinData.quotes!.uSD!.percentChange7d;
-              rank = coinData.rank;
+      for (var coin in coinsList) {
+        String id = coin.coinId;
+        if (internet) {
+          responseCoinById = await _apiRepository.coinById(id);
+        }
+        id = coin.coinId;
+        symbol = coin.symbol;
+        name = coin.name;
+        image = coin.image;
+        priseUsd = coin.price!;
+        marketCap = coin.marketCap;
+        percentChange24h = coin.percentChange24h;
+        percentChange7d = coin.percentChange7d;
+        rank = coin.rank;
+        isRelevant = 0;
+        if (responseCoinById != null &&
+            responseCoinById.statusCode == HttpStatus.ok) {
+          var coinData1 = (jsonDecode(responseCoinById.body));
+          var coinData = CoinModel.fromJson(coinData1);
+          print("!!!!coinData!!!!! = $coinData");
+          id = coinData.id!;
+          symbol = coinData.symbol;
+          name = coinData.name;
+          image =
+              'https://static.coinpaprika.com/coin/${coinData.id!}/logo.png';
+          priseUsd = coinData.quotes!.uSD!.price!;
+          marketCap = coinData.quotes!.uSD!.marketCap;
+          percentChange24h = coinData.quotes!.uSD!.percentChange24h;
+          percentChange7d = coinData.quotes!.uSD!.percentChange7d;
+          rank = coinData.rank;
+          isRelevant = 1;
+          print("!!! 4 !!!");
+        } else if (statusCardano == HttpStatus.ok) {
+          for (var cardano in cardanoList) {
+            print("!!!!222 cardano id = $id , cardano = $cardano");
+            if (cardano.tokenId == id) {
+              id = cardano.tokenId!;
+              name = cardano.name!;
+              symbol = cardano.name!;
+              image =
+                  'https://ctokens.io/api/v1/tokens/images/${cardano.policyId}.${cardano.assetId}.png';
+              priseUsd = cardano.priceUsd!;
+              marketCap = cardano.capUsd!.toInt();
+              percentChange24h = cardano.priceTrend24h;
+              percentChange7d = cardano.priceTrend7d;
+              rank = cardano.decimals;
               isRelevant = 1;
-              print("!!! 4 !!!");
+              print("!!! 5 !!!");
+              break;
             }
-            else if (statusCardano == HttpStatus.ok) {
-              for (var cardano in cardanoList) {
-                print("!!!!222 cardano id = $id , cardano = $cardano");
-                if (cardano.tokenId == id) {
-                  id = cardano.tokenId!;
-                  name = cardano.name!;
-                  symbol = cardano.name!;
-                  image = 'https://ctokens.io/api/v1/tokens/images/${cardano.policyId}.${cardano.assetId}.png';
-                  priseUsd = cardano.priceUsd!;
-                  marketCap = cardano.capUsd!.toInt();
-                  percentChange24h = cardano.priceTrend24h;
-                  percentChange7d = cardano.priceTrend7d;
-                  rank = cardano.decimals;
-                  isRelevant = 1;
-                  print("!!! 5 !!!");
-                  break;
-                } else {
-                  id = coin.coinId;
-                  name = coin.name;
-                  symbol = coin.symbol;
-                  image = coin.image;
-                  priseUsd = coin.price!;
-                  marketCap = coin.marketCap;
-                  percentChange24h = coin.percentChange24h;
-                  percentChange7d = coin.percentChange7d;
-                  rank = coin.rank;
-                  isRelevant = coin.isRelevant;
-                  print(' !!!! cache = false symbol = $symbol');
-                  print("!!! 6 !!!");
-                }
-              }
-            } else if ((await _dbRepository.getCoin(id)).coinId.isNotEmpty) {
-              id = coin.coinId;
-              name = coin.name;
-              symbol = coin.symbol;
-              image = coin.image;
-              priseUsd = coin.price!;
-              marketCap = coin.marketCap;
-              percentChange24h = coin.percentChange24h;
-              percentChange7d = coin.percentChange7d;
-              rank = coin.rank;
-              isRelevant = coin.isRelevant;
-              print("!!! 7 !!!");
-              print(' !!!! cache= false symbol = $symbol ');
-            }
-          transaction = await _dbRepository.getAllTransactionByIdCoin(id);
-          if (transaction.isNotEmpty) {
-            for (var element in transaction) {
-              cost = element.qty;
-              print(element);
-              if (element.type == 'In') {
-                walletInOut += cost * priseUsd;
-                costInOut += cost;
-              } else if (element.type == 'Out') {
-                walletInOut -= cost * priseUsd;
-                costInOut -= cost;
-              }
-            }
-          } else {
-            costInOut = 0.0;
-            walletInOut = 0.0;
           }
-          print("priseUsd = $priseUsd, costInOut = $costInOut, walletInOut = $walletInOut");
-          listCoin.add(ListCoin(
-              coinId: id,
-              name: name!,
-              symbol: symbol!,
-              image: image!,
-              quantity: costInOut,
-              costUsd: walletInOut,
-              marketCap: marketCap,
-              percentChange24h: percentChange24h,
-              percentChange7d: percentChange7d,
-              rank: rank,
-              price: priseUsd.toDouble(),
-              isRelevant: isRelevant));
-
+        } else if ((await _dbRepository.getCoin(id)).coinId.isNotEmpty) {
+          id = coin.coinId;
+          name = coin.name;
+          symbol = coin.symbol;
+          image = coin.image;
+          priseUsd = coin.price!;
+          marketCap = coin.marketCap;
+          percentChange24h = coin.percentChange24h;
+          percentChange7d = coin.percentChange7d;
+          rank = coin.rank;
+          isRelevant = 0;
+          print("!!! 7 !!!");
+          print(' !!!! cache= false symbol = $symbol ');
+        }
+        transaction = await _dbRepository.getAllTransactionByIdCoin(id);
+        if (transaction.isNotEmpty) {
+          for (var element in transaction) {
+            cost = element.qty;
+            print(element);
+            if (element.type == 'In') {
+              walletInOut += cost * priseUsd;
+              costInOut += cost;
+            } else if (element.type == 'Out') {
+              walletInOut -= cost * priseUsd;
+              costInOut -= cost;
+            }
+          }
+        } else {
           costInOut = 0.0;
           walletInOut = 0.0;
         }
+        print(
+            "priseUsd = $priseUsd, costInOut = $costInOut, walletInOut = $walletInOut");
+        listCoin.add(ListCoin(
+            coinId: id,
+            name: name!,
+            symbol: symbol!,
+            image: image!,
+            quantity: costInOut,
+            costUsd: walletInOut,
+            marketCap: marketCap,
+            percentChange24h: percentChange24h,
+            percentChange7d: percentChange7d,
+            rank: rank,
+            price: priseUsd.toDouble(),
+            isRelevant: isRelevant));
+
+        costInOut = 0.0;
+        walletInOut = 0.0;
       }
+    }
     listCoin = await updatedRank(listCoin);
     print("getListCoin listCoin  = $listCoin");
     return listCoin;
@@ -373,9 +380,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     //     .toList();
     //  print("coinPrice1 = $coinPrice");
     //  await FileManager.saveList(coinList);
-   // var now = new DateTime.now();
+    // var now = new DateTime.now();
     //var formatterCache = new DateFormat('yyyy-MM-dd hh:mm');
-   //// String formattedDateCache = formatterCache.format(now);
+    //// String formattedDateCache = formatterCache.format(now);
     var coinsId = await _hiveProfileRepository.getCoinId();
     print("coinsId ProfBloc = $coinsId");
 
@@ -394,7 +401,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               coinId: coinById.id!,
               name: coinById.name!,
               symbol: coinById.symbol!,
-              image: 'https://static.coinpaprika.com/coin/${coinById.id!}/logo.png',
+              image:
+                  'https://static.coinpaprika.com/coin/${coinById.id!}/logo.png',
               currentPrice: coinById.quotes!.uSD!.price!,
               marketCap: coinById.quotes!.uSD!.marketCap,
               percentChange24h: coinById.quotes!.uSD!.percentChange24h,
@@ -404,33 +412,36 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               isRelevant: 1); // 0-false 1-true
           await FileManager.saveCoinById(coinElem.id, (coin.toDatabaseJson()));
           await _dbRepository.updateCoinIsRelevant(coin);
-          print("fm coinById = ${CoinEntity.fromDatabaseJson(await FileManager.readCoinById(coinElem.id))}");
+          print(
+              "fm coinById = ${CoinEntity.fromDatabaseJson(await FileManager.readCoinById(coinElem.id))}");
         } else if (responseCardano.statusCode == HttpStatus.ok) {
-            Map data = jsonDecode(responseCardano.body);
-            var cardanoList = (data["tokens"] as List)
-                .map((e) => Tokens.fromJson(e))
-                .cast<Tokens>()
-                .toList();
-            for (var cardano in cardanoList) {
-              if (coinElem.id == cardano.tokenId) {
-                var coin = CoinEntity(
-                    coinId: cardano.tokenId!,
-                    name: cardano.name!,
-                    symbol: cardano.name!,
-                    image: 'https://ctokens.io/api/v1/tokens/images/${cardano.policyId}.${cardano.assetId}.png',
-                    currentPrice: cardano.priceUsd!,
-                    marketCap: cardano.capUsd!.toInt(),
-                    percentChange24h: cardano.priceTrend24h,
-                    percentChange7d: cardano.priceTrend7d,
-                    rank: cardano.decimals,
-                    price: cardano.priceUsd,
-                    isRelevant: 1);
-                await FileManager.saveCoinById(coinElem.id, (coin.toDatabaseJson()));
-                await _dbRepository.updateCoinIsRelevant(coin);
-              }
+          Map data = jsonDecode(responseCardano.body);
+          var cardanoList = (data["tokens"] as List)
+              .map((e) => Tokens.fromJson(e))
+              .cast<Tokens>()
+              .toList();
+          for (var cardano in cardanoList) {
+            if (coinElem.id == cardano.tokenId) {
+              var coin = CoinEntity(
+                  coinId: cardano.tokenId!,
+                  name: cardano.name!,
+                  symbol: cardano.name!,
+                  image:
+                      'https://ctokens.io/api/v1/tokens/images/${cardano.policyId}.${cardano.assetId}.png',
+                  currentPrice: cardano.priceUsd!,
+                  marketCap: cardano.capUsd!.toInt(),
+                  percentChange24h: cardano.priceTrend24h,
+                  percentChange7d: cardano.priceTrend7d,
+                  rank: cardano.decimals,
+                  price: cardano.priceUsd,
+                  isRelevant: 1);
+              await FileManager.saveCoinById(
+                  coinElem.id, (coin.toDatabaseJson()));
+              await _dbRepository.updateCoinIsRelevant(coin);
             }
+          }
         } else {
-         var coinIdDB = await _dbRepository.getCoin(coinElem.id);
+          var coinIdDB = await _dbRepository.getCoin(coinElem.id);
           var coin = CoinEntity(
               coinId: coinElem.id,
               name: coinIdDB.name,

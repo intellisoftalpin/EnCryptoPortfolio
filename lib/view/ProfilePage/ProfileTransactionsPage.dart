@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../app.dart';
+import '../../data/repository/ApiRepository/IApiRepository.dart';
 import 'ProfilePage.dart';
 import 'TransactionDetailsPage.dart';
 import 'TransactionsPage.dart';
@@ -29,10 +30,10 @@ class ProfileTransactionsPage extends StatefulWidget {
   static Route route() {
     return MaterialPageRoute<void>(
         builder: (_) => ProfileTransactionsPage(
-          id: '',
-          symbol: '',
-          isRelevant: 1,
-        ));
+              id: '',
+              symbol: '',
+              isRelevant: 1,
+            ));
   }
 
   @override
@@ -58,9 +59,15 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
   var d = NumberFormat('##0.0##');
   bool _isVisible = false;
 
+  Future<bool> internet() async {
+    IApiRepository _apiRepository = ApiRepository();
+    bool internet = await _apiRepository.check();
+    return internet;
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('HEIGHT: ${ MediaQuery.of(context).size.height}');
+    print('HEIGHT: ${MediaQuery.of(context).size.height}');
     isScreenSmall = MediaQuery.of(context).size.height < 600 ? true : false;
     print('isScreenSmall: $isScreenSmall');
     scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -71,13 +78,8 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ProfileTransactionBloc>(
-          create: (context) => ProfileTransactionBloc(
-              DatabaseProvider(),
-              ApiRepository(),
-              walletCoin,
-              transactionList,
-              id,
-              transactionId),
+          create: (context) => ProfileTransactionBloc(DatabaseProvider(),
+              ApiRepository(), walletCoin, transactionList, id, transactionId),
         ),
       ],
       child: BlocBuilder<ProfileTransactionBloc, ProfileTransactionState>(
@@ -101,15 +103,15 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
               appBar: AppBar(
                 elevation: 0.0,
                 backgroundColor: Theme.of(context).primaryColor,
-                title: state.transactionList!.length > 1 ?
-                Text(LocaleKeys.transactions.tr() + " $symbol",
-                  overflow: TextOverflow.fade,
-                  style: kAppBarTextStyle(context, isScreenSmall)) :
-                Text(
-                  LocaleKeys.transaction.tr() + " $symbol",
-                  overflow: TextOverflow.fade,
-                  style: kAppBarTextStyle(context, isScreenSmall),
-                ),
+                title: state.transactionList!.length > 1
+                    ? Text(LocaleKeys.transactions.tr() + " $symbol",
+                        overflow: TextOverflow.fade,
+                        style: kAppBarTextStyle(context, isScreenSmall))
+                    : Text(
+                        LocaleKeys.transaction.tr() + " $symbol",
+                        overflow: TextOverflow.fade,
+                        style: kAppBarTextStyle(context, isScreenSmall),
+                      ),
                 leading: IconButton(
                   icon: Icon(
                     Icons.arrow_back_ios,
@@ -125,11 +127,11 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
               ),
               floatingActionButton: state.transactionList!.isEmpty
                   ? Visibility(
-                  visible: _isVisible, child: getFloatingActionButton())
+                      visible: _isVisible, child: getFloatingActionButton())
                   : Visibility(
-                  visible: !_isVisible, child: getFloatingActionButton()),
+                      visible: !_isVisible, child: getFloatingActionButton()),
               floatingActionButtonLocation:
-              FloatingActionButtonLocation.endFloat,
+                  FloatingActionButtonLocation.endFloat,
               body: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -142,254 +144,343 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
                           .copyWith(color: Theme.of(context).hintColor)
                           .color,
                     ),
-                    if (isRelevant == 0)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16.0),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'assets/image/warning.png',
-                              // color: arrowColor,
-                              height: 45,
-                              width: (MediaQuery.of(context).size.width - 30) /
-                                  16.5,
-                            ),
-                            Expanded(
-                              child: Container(
-                                  margin: EdgeInsets.only(
-                                      top: 16.0,
-                                      left: 16.0,
-                                      right: 16.0,
-                                      bottom: 8),
-                                  child: Center(
-                                    child: Text(
-                                      LocaleKeys.coin_is_relevant.tr(),
-                                      style: TextStyle(
-                                        fontSize: MinTextSize,
-                                        color: lErrorColorLight,
+                    FutureBuilder(
+                      future: internet(),
+                      builder:
+                          (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                        if (snapshot.hasData)
+                          return (isRelevant == 0 && snapshot.data! == true)
+                              ? Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/image/warning.png',
+                                        // color: arrowColor,
+                                        height: 45,
+                                        width:
+                                            (MediaQuery.of(context).size.width -
+                                                    30) /
+                                                16.5,
                                       ),
-                                    ),
-                                  )),
-                            ),
-                          ],
-                        ),
-                      ),
+                                      Expanded(
+                                        child: Container(
+                                            margin: EdgeInsets.only(
+                                                top: 16.0,
+                                                left: 16.0,
+                                                right: 16.0,
+                                                bottom: 8),
+                                            child: Center(
+                                              child: Text(
+                                                LocaleKeys.coin_is_relevant
+                                                    .tr(),
+                                                style: TextStyle(
+                                                  fontSize: textSize14,
+                                                  color: lErrorColorLight,
+                                                ),
+                                              ),
+                                            )),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : (isRelevant == 0 && snapshot.data! == false)
+                                  ? Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 16.0),
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                            'assets/image/warning.png',
+                                            // color: arrowColor,
+                                            height: 45,
+                                            width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width -
+                                                    30) /
+                                                16.5,
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                                margin: EdgeInsets.only(
+                                                    top: 16.0,
+                                                    left: 16.0,
+                                                    right: 16.0,
+                                                    bottom: 8),
+                                                child: Center(
+                                                  child: Text(
+                                                    LocaleKeys
+                                                        .coin_is_relevant_internet
+                                                        .tr(),
+                                                    style: TextStyle(
+                                                      fontSize: textSize14,
+                                                      color: lErrorColorLight,
+                                                    ),
+                                                  ),
+                                                )),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : SizedBox.shrink();
+                        else
+                          return SizedBox.shrink();
+                      },
+                    ),
                     state.transactionList!.isEmpty
                         ? Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            TransactionsPage(
-                                                symbol: symbol,
-                                                id: id,
-                                                transactionId: -1,
-                                                isRelevant: isRelevant)));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(46.0)),
-                                  backgroundColor: Theme.of(context)
-                                      .secondaryHeaderColor,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 23, horizontal: 23)),
-                              child: new Icon(Icons.add,
-                                  size: 45.0,
-                                  color: Theme.of(context).shadowColor),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TransactionsPage(
+                                                      symbol: symbol,
+                                                      id: id,
+                                                      transactionId: -1,
+                                                      isRelevant: isRelevant)));
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(46.0)),
+                                        backgroundColor: Theme.of(context)
+                                            .secondaryHeaderColor,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 23, horizontal: 23)),
+                                    child: new Icon(Icons.add,
+                                        size: 45.0,
+                                        color: Theme.of(context).shadowColor),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    LocaleKeys.press_add_transaction.tr(),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline4!
+                                        .copyWith(
+                                            fontSize: MediumPriceTextSize,
+                                            color: Theme.of(context).hintColor),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              LocaleKeys.press_add_transaction.tr(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4!
-                                  .copyWith(
-                                  fontSize: MediumPriceTextSize,
-                                  color: Theme.of(context).hintColor),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
+                          )
                         : Expanded(
-                      child: Padding(
-                        padding:
-                        const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                        child: ListView.builder(
-                            itemCount: state.transactionList!.length,
-                            itemBuilder:
-                                (BuildContext context, int index) {
-                              return Dismissible(
-                                key: UniqueKey(),
-                                confirmDismiss:
-                                    (DismissDirection direction) async {
-                                  if (direction ==
-                                      DismissDirection.startToEnd) {
-                                    return await showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                            contentPadding: EdgeInsets.zero,
-                                            backgroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                                            content: Padding(
-                                              padding: const EdgeInsets.only(top: 10.0),
-                                              child: Container(
-                                                  padding: EdgeInsets.only(
-                                                      top: 10.0, right: 10.0, left: 10.0, bottom: 5.0),
-                                                  child: Text(LocaleKeys
-                                                      .confirm_delete
-                                                      .tr(),
-                                                    textAlign: TextAlign.center,
-                                                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                                                        color: Theme.of(context).hoverColor,
-                                                        fontFamily: 'MyriadPro',
-                                                        fontSize: 14),
-                                                  )),
-                                            ),
-                                            actions: <Widget>[
-                                              Center(
-                                                  child: Column(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                              child: ListView.builder(
+                                  itemCount: state.transactionList!.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Dismissible(
+                                      key: UniqueKey(),
+                                      confirmDismiss:
+                                          (DismissDirection direction) async {
+                                        if (direction ==
+                                            DismissDirection.startToEnd) {
+                                          return await showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                contentPadding: EdgeInsets.zero,
+                                                backgroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                20.0))),
+                                                content: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 10.0),
+                                                  child: Container(
+                                                      padding: EdgeInsets.only(
+                                                          top: 10.0,
+                                                          right: 10.0,
+                                                          left: 10.0,
+                                                          bottom: 5.0),
+                                                      child: Text(
+                                                        LocaleKeys
+                                                            .confirm_delete
+                                                            .tr(),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline6!
+                                                            .copyWith(
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .hoverColor,
+                                                                fontFamily:
+                                                                    'MyriadPro',
+                                                                fontSize: 14),
+                                                      )),
+                                                ),
+                                                actions: <Widget>[
+                                                  Center(
+                                                      child: Column(
                                                     children: [
                                                       SizedBox(
                                                         height: 10.0,
                                                       ),
-                                                      Divider(height: 1.0, color: Theme.of(context).hoverColor),
+                                                      Divider(
+                                                          height: 1.0,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .hoverColor),
                                                       SizedBox(height: 10.0),
-
                                                       Container(
                                                           child: Row(
-                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
                                                               children: [
-                                                                InkWell(
-                                                                  onTap: () async {
-                                                                    Navigator.of(context).pop(true);
-                                                                  },
-                                                                  child: Container(
-                                                                      width: 100.0,
-                                                                      height: 25.0,
-                                                                      child: Text(LocaleKeys.yes.tr(),
-                                                                        textAlign: TextAlign.center,
-                                                                        style: Theme.of(context)
-                                                                            .textTheme
-                                                                            .headline6!
-                                                                            .copyWith(
-                                                                            color: kInIconColor,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            fontFamily: 'MyriadPro',
-                                                                            fontSize: 18),
-                                                                      )),
-                                                                ),
-                                                                SizedBox(
-                                                                  width: 50.0,
-                                                                ),
-                                                                InkWell(
-                                                                  onTap: () {
-                                                                    Navigator.of(context).pop(false);
-                                                                  },
-                                                                  child: Container(
-                                                                      width: 100.0,
-                                                                      height: 25.0,
-                                                                      child: Text(
-                                                                        LocaleKeys.no.tr(),
-                                                                        textAlign: TextAlign.center,
-                                                                        style: Theme.of(context)
-                                                                            .textTheme
-                                                                            .headline6!
-                                                                            .copyWith(
-                                                                            color: kErrorColorLight,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            fontFamily: 'MyriadPro',
-                                                                            fontSize: 18),
-                                                                      )),
-                                                                ),
-                                                              ])),
+                                                            InkWell(
+                                                              onTap: () async {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(true);
+                                                              },
+                                                              child: Container(
+                                                                  width: 100.0,
+                                                                  height: 25.0,
+                                                                  child: Text(
+                                                                    LocaleKeys
+                                                                        .yes
+                                                                        .tr(),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                                                                        color:
+                                                                            kInIconColor,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontFamily:
+                                                                            'MyriadPro',
+                                                                        fontSize:
+                                                                            18),
+                                                                  )),
+                                                            ),
+                                                            SizedBox(
+                                                              width: 50.0,
+                                                            ),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(false);
+                                                              },
+                                                              child: Container(
+                                                                  width: 100.0,
+                                                                  height: 25.0,
+                                                                  child: Text(
+                                                                    LocaleKeys
+                                                                        .no
+                                                                        .tr(),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                                                                        color:
+                                                                            kErrorColorLight,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontFamily:
+                                                                            'MyriadPro',
+                                                                        fontSize:
+                                                                            18),
+                                                                  )),
+                                                            ),
+                                                          ])),
                                                     ],
                                                   ))
-                                            ],
+                                                ],
+                                              );
+                                            },
                                           );
+                                        } else if (direction ==
+                                            DismissDirection.endToStart) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TransactionsPage(
+                                                          symbol: symbol,
+                                                          id: id,
+                                                          transactionId: state
+                                                              .transactionList![
+                                                                  index]
+                                                              .transactionId!,
+                                                          isRelevant:
+                                                              isRelevant)));
+                                        }
+                                        return null;
                                       },
+                                      onDismissed: (direction) {
+                                        BlocProvider.of<ProfileTransactionBloc>(
+                                                context)
+                                            .add(DeleteTransaction(
+                                                transactionId: state
+                                                    .transactionList![index]
+                                                    .transactionId!));
+                                        setState(() {});
+                                      },
+                                      background: Container(
+                                          color: Theme.of(context)
+                                              .secondaryHeaderColor,
+                                          alignment: Alignment.center,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                  margin: EdgeInsets.only(
+                                                      left: 20.0),
+                                                  child: Icon(
+                                                    Icons.delete,
+                                                    size: Theme.of(context)
+                                                        .iconTheme
+                                                        .copyWith(
+                                                            size: MediumIcon)
+                                                        .size,
+                                                    color: Theme.of(context)
+                                                        .primaryColorDark,
+                                                  )),
+                                              Container(
+                                                  margin: EdgeInsets.only(
+                                                      left: 20.0),
+                                                  child: Icon(
+                                                    Icons.edit,
+                                                    size: Theme.of(context)
+                                                        .iconTheme
+                                                        .copyWith(
+                                                            size: MediumIcon)
+                                                        .size,
+                                                    color: Theme.of(context)
+                                                        .primaryColorDark,
+                                                  )),
+                                            ],
+                                          )),
+                                      child: getListTransaction(
+                                          index, state, context),
                                     );
-                                  } else if (direction ==
-                                      DismissDirection.endToStart) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                TransactionsPage(
-                                                    symbol: symbol,
-                                                    id: id,
-                                                    transactionId: state
-                                                        .transactionList![
-                                                    index]
-                                                        .transactionId!,
-                                                    isRelevant:
-                                                    isRelevant)));
-                                  }
-                                  return null;
-                                },
-                                onDismissed: (direction) {
-                                  BlocProvider.of<ProfileTransactionBloc>(
-                                      context)
-                                      .add(DeleteTransaction(
-                                      transactionId: state
-                                          .transactionList![index]
-                                          .transactionId!));
-                                  setState(() {});
-                                },
-                                background: Container(
-                                    color: Theme.of(context)
-                                        .secondaryHeaderColor,
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                            margin: EdgeInsets.only(
-                                                left: 20.0),
-                                            child: Icon(
-                                              Icons.delete,
-                                              size: Theme.of(context)
-                                                  .iconTheme
-                                                  .copyWith(
-                                                  size: MediumIcon)
-                                                  .size,
-                                              color: Theme.of(context)
-                                                  .primaryColorDark,
-                                            )),
-                                        Container(
-                                            margin: EdgeInsets.only(
-                                                left: 20.0),
-                                            child: Icon(
-                                              Icons.edit,
-                                              size: Theme.of(context)
-                                                  .iconTheme
-                                                  .copyWith(
-                                                  size: MediumIcon)
-                                                  .size,
-                                              color: Theme.of(context)
-                                                  .primaryColorDark,
-                                            )),
-                                      ],
-                                    )),
-                                child: getListTransaction(
-                                    index, state, context),
-                              );
-                            }),
-                      ),
-                    ),
+                                  }),
+                            ),
+                          ),
                   ]),
             ),
           );
@@ -412,7 +503,7 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
     }
     print("date= $date, time= $time, dateTime= $dateTime");
     walletCoin =
-    (walletCoin.isEmpty) ? walletCoin = [0.0, 0.0, 0.0] : walletCoin;
+        (walletCoin.isEmpty) ? walletCoin = [0.0, 0.0, 0.0] : walletCoin;
     if (walletCoin.last > 1.0 || walletCoin.last < -1.0) {
       wallet = Decimal.dividePrice(
           Decimal.convertPriceRound(walletCoin.last).toString());
@@ -423,7 +514,7 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
         "walletCoin PTPage = $walletCoin, !!! ${Decimal.convertPriceRound(walletCoin.first).toString()}");
     return Padding(
       padding:
-      const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0, bottom: 8.0),
+          const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0, bottom: 8.0),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
@@ -452,8 +543,8 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
                               .textTheme
                               .headline6!
                               .copyWith(
-                              fontSize: MediumTextSize,
-                              color: Theme.of(context).shadowColor),
+                                  fontSize: MediumTextSize,
+                                  color: Theme.of(context).shadowColor),
                         ),
                       ),
                       Padding(
@@ -481,10 +572,10 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
                                 .textTheme
                                 .headline6!
                                 .copyWith(
-                                fontSize: LightTextSize,
-                                color: isRelevant == 1
-                                    ? Color(0x93282B30)
-                                    : lErrorColorLight),
+                                    fontSize: LightTextSize,
+                                    color: isRelevant == 1
+                                        ? Color(0x93282B30)
+                                        : lErrorColorLight),
                           ),
                         ),
                     ]),
@@ -507,14 +598,15 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
     bool visible = false;
     print('USD:::${state.transactionList![index].usdPrice!}');
     String qty =
-    Decimal.convertPriceRound(state.transactionList![index].qty).toString();
+        Decimal.convertPriceRound(state.transactionList![index].qty).toString();
     if (state.transactionList![index].usdPrice! < 1.0) {
       usdPrice =
           Decimal.convertPriceRound(state.transactionList![index].usdPrice!)
               .toString();
     } else {
-      usdPrice = Decimal.dividePrice(Decimal.convertPriceRound(state.transactionList![index].usdPrice!)
-          .toString());
+      usdPrice = Decimal.dividePrice(
+          Decimal.convertPriceRound(state.transactionList![index].usdPrice!)
+              .toString());
     }
     currentPrice = Decimal.convertPriceRound(
         walletCoin[1] * state.transactionList![index].qty);
@@ -525,20 +617,25 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
     print(
         " currentPrice = $currentPrice, state.transactionList![index].walletAddress = ${state.transactionList![index].walletAddress}");
     visible = (state.transactionList![index].walletAddress!.isEmpty ||
-        state.transactionList![index].walletAddress == ' ')
+            state.transactionList![index].walletAddress == ' ')
         ? false
         : true;
     if (state.transactionList![index].type == 'In') {
       minus = '';
-      if(state.transactionList![index].qty == 0){
-        iconTr = SvgPicture.asset('assets/icons/bidirectional_arrow.svg', height: 30, color: Theme.of(context)
-            .cardTheme
-            .copyWith(color: Theme.of(context).secondaryHeaderColor)
-            .color,);
-      }else{
+      if (state.transactionList![index].qty == 0) {
+        iconTr = SvgPicture.asset(
+          'assets/icons/bidirectional_arrow.svg',
+          height: 30,
+          color: Theme.of(context)
+              .cardTheme
+              .copyWith(color: Theme.of(context).secondaryHeaderColor)
+              .color,
+        );
+      } else {
         iconTr = Icon(
           Icons.arrow_upward_outlined,
-          color: Theme.of(context).iconTheme.copyWith(color: kInIconColor).color,
+          color:
+              Theme.of(context).iconTheme.copyWith(color: kInIconColor).color,
         );
       }
       icon = Text(
@@ -553,15 +650,20 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
       } else {
         minus = '-';
       }
-      if(state.transactionList![index].qty == 0){
-        iconTr = SvgPicture.asset('assets/icons/bidirectional_arrow.svg', height: 30, color:  Theme.of(context)
-            .cardTheme
-            .copyWith(color: Theme.of(context).secondaryHeaderColor)
-            .color,);
-      }else {
+      if (state.transactionList![index].qty == 0) {
+        iconTr = SvgPicture.asset(
+          'assets/icons/bidirectional_arrow.svg',
+          height: 30,
+          color: Theme.of(context)
+              .cardTheme
+              .copyWith(color: Theme.of(context).secondaryHeaderColor)
+              .color,
+        );
+      } else {
         iconTr = Icon(
           Icons.arrow_downward_outlined,
-          color: Theme.of(context).iconTheme.copyWith(color: kOutIconColor).color,
+          color:
+              Theme.of(context).iconTheme.copyWith(color: kOutIconColor).color,
         );
       }
       icon = Text(
@@ -584,12 +686,14 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
 
     if (realPrice !=
         Decimal.convertPriceRound(state.transactionList![index].usdPrice!)) {
-      usd = '${realPrice > 1.0 ? Decimal.dividePrice(realPrice.toString()) : realPrice} ($usdPrice) \$';
+      usd =
+          '${realPrice > 1.0 ? Decimal.dividePrice(realPrice.toString()) : realPrice} ($usdPrice) \$';
       sumUsd =
-      '$minus ${(walletCoin[1] * state.transactionList![index].qty > 1.0) ? Decimal.dividePrice(currentPrice.toString()) : currentPrice.toString()} (${customCurrentPrice > 1.0 ? Decimal.dividePrice(customCurrentPrice.toString()) : customCurrentPrice}) \$';
+          '$minus ${(walletCoin[1] * state.transactionList![index].qty > 1.0) ? Decimal.dividePrice(currentPrice.toString()) : currentPrice.toString()} (${customCurrentPrice > 1.0 ? Decimal.dividePrice(customCurrentPrice.toString()) : customCurrentPrice}) \$';
     } else {
       usd = '$usdPrice \$';
-      sumUsd = '$minus ${(walletCoin[1] * state.transactionList![index].qty > 1.0) ? Decimal.dividePrice(currentPrice.toString()) : currentPrice.toString()} \$';
+      sumUsd =
+          '$minus ${(walletCoin[1] * state.transactionList![index].qty > 1.0) ? Decimal.dividePrice(currentPrice.toString()) : currentPrice.toString()} \$';
     }
     return Row(
       children: [
@@ -612,7 +716,7 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
                 children: [
                   Padding(
                     padding:
-                    const EdgeInsets.only(top: 3.0, right: 8.0, left: 8.0),
+                        const EdgeInsets.only(top: 3.0, right: 8.0, left: 8.0),
                     child: Material(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5.0),
@@ -681,10 +785,10 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
                                 .textTheme
                                 .headline6!
                                 .copyWith(
-                                fontSize: ProfileCoinSmallText,
-                                color: isRelevant == 1
-                                    ? Theme.of(context).hintColor
-                                    : lErrorColorLight),
+                                    fontSize: ProfileCoinSmallText,
+                                    color: isRelevant == 1
+                                        ? Theme.of(context).hintColor
+                                        : lErrorColorLight),
                           ),
                         ),
                       ],
@@ -750,27 +854,27 @@ class _ProfileTransactionsPageState extends State<ProfileTransactionsPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => TransactionsDetailsPage(
-                          id: id,
-                          symbol: symbol,
-                          isRelevant: isRelevant,
-                          transactionId:
-                          state.transactionList![index].transactionId!,
-                          cost:
-                          state.transactionList![index].qty.toString(),
-                          type: state.transactionList![index].type,
-                          details: state.transactionList![index].details,
-                          timestamp:
-                          state.transactionList![index].timestamp,
-                          price: state.transactionList![index].usdPrice!,
-                          realPrice:
-                          Decimal.convertPriceRound(walletCoin[1]),
-                          trastWallet:
-                          state.transactionList![index].walletAddress!,
-                          // commonPrice: currentPrice,
-                          // commonPrice: walletCoin[1],
-                          amountOfCoins: walletCoin.first,
-                          commonPrice: walletCoin.last,
-                        ))),
+                              id: id,
+                              symbol: symbol,
+                              isRelevant: isRelevant,
+                              transactionId:
+                                  state.transactionList![index].transactionId!,
+                              cost:
+                                  state.transactionList![index].qty.toString(),
+                              type: state.transactionList![index].type,
+                              details: state.transactionList![index].details,
+                              timestamp:
+                                  state.transactionList![index].timestamp,
+                              price: state.transactionList![index].usdPrice!,
+                              realPrice:
+                                  Decimal.convertPriceRound(walletCoin[1]),
+                              trastWallet:
+                                  state.transactionList![index].walletAddress!,
+                              // commonPrice: currentPrice,
+                              // commonPrice: walletCoin[1],
+                              amountOfCoins: walletCoin.first,
+                              commonPrice: walletCoin.last,
+                            ))),
               },
             ),
           ),

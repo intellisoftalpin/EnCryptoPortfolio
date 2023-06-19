@@ -178,4 +178,5 @@ abstract class  LocaleKeys {
   static const replace_recovery_alert = 'replace_recovery_alert';
   static const create_new_portfolio = 'create_new_portfolio';
   static const success_change_pass = 'success_change_pass';
+  static const coin_is_relevant_internet = 'coin_is_relevant_internet';
 }
