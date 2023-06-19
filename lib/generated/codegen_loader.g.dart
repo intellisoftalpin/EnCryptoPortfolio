@@ -181,21 +181,29 @@ class CodegenLoader extends AssetLoader {
     "backUpSet1": "Don't ask & delete",
     "backUpSet2": "Don't ask & don't delete",
     "noCoinsFound": "No coins found",
-    "recovery_good" : "Good file. Be careful when performing recovery. Overwritten portfolios will not be able to recover. Do you want to continue?",
-    "recovery_error_telegram" : "You are trying to restore a ZIP file from the Telegram messenger. Please download this ZIP file to your device and restore it from the file system.",
-    "recovery_error_size" : "ZIP file size should not exceed 10 MB.",
-    "recovery_error_contain" : "ZIP file contains more than 1 file inside. Please choose another ZIP file.",
-    "recovery_error_inside" : "The file inside the ZIP file does not have a DB extension. Please choose another ZIP file.",
-    "recovery_error_inside_db" : "DB The file contained in the ZIP archive is not an EnCrypto recovery file.",
-    "recovery_error_format" : "The file you are sharing with the application is not in the correct format. The file must be in ZIP or DB format.",
-    "enter_pass_recovery" : "Enter pass from recovery portfolio",
-    "create_port_recovery" : "Please, create a portfolio",
-    "choose_port_recovery" : "Choose portfolio to restore:",
-    "bio_recovery_alert" : "Would you like to add biometric authentication?",
-    "replace_recovery_alert" : "Do you really want to replace chosen portfolio?",
-    "create_new_portfolio" : "Create new Portfolio",
+    "recovery_good":
+        "Good file. Be careful when performing recovery. Overwritten portfolios will not be able to recover. Do you want to continue?",
+    "recovery_error_telegram":
+        "You are trying to restore a ZIP file from the Telegram messenger. Please download this ZIP file to your device and restore it from the file system.",
+    "recovery_error_size": "ZIP file size should not exceed 10 MB.",
+    "recovery_error_contain":
+        "ZIP file contains more than 1 file inside. Please choose another ZIP file.",
+    "recovery_error_inside":
+        "The file inside the ZIP file does not have a DB extension. Please choose another ZIP file.",
+    "recovery_error_inside_db":
+        "DB The file contained in the ZIP archive is not an EnCrypto recovery file.",
+    "recovery_error_format":
+        "The file you are sharing with the application is not in the correct format. The file must be in ZIP or DB format.",
+    "enter_pass_recovery": "Enter pass from recovery portfolio",
+    "create_port_recovery": "Please, create a portfolio",
+    "choose_port_recovery": "Choose portfolio to restore:",
+    "bio_recovery_alert": "Would you like to add biometric authentication?",
+    "replace_recovery_alert": "Do you really want to replace chosen portfolio?",
+    "create_new_portfolio": "Create new Portfolio",
     "success_change_pass": "You have successfully changed your password!",
-    "coin_is_relevant": "The coin didn't pass the server check, the value data is taken from the database and will not be updated automatically. We apologize."
+    "coin_is_relevant":
+        "The coin didn't pass the server check, the value data is taken from the database and will not be updated automatically. We apologize.",
+    "coin_is_relevant_internet": "No internet connection"
   };
   static const Map<String, dynamic> ru = {
     "forgot_password": "Забыли пароль?",
@@ -368,22 +376,31 @@ class CodegenLoader extends AssetLoader {
     "backUpSet1": "Не спрашивать и удалять",
     "backUpSet2": "Не спрашивать и не удалять",
     "noCoinsFound": "Монеты не найдены",
-    "recovery_good" : "Файл подходит. Будьте внимательны при проведении восстановления. Перезаписанное портфолио не будут иметь возможности восстановиться. Желаете ли вы продолжить?",
-    "recovery_error_telegram" : "Вы пытаетесь восстановить портфолио из приложения Telegram. Пожалуйста, скачайте желаемый файл на ваше устройство и проведите восстановление из хранилища.",
-    "recovery_error_size" : "Размер ZIP файла не должен превышать 10 МБ.",
-    "recovery_error_contain" : "ZIP файл содержит внутри более одного файла. Пожалуйста, выберете другой ZIP файл.",
-    "recovery_error_inside" : "Формат файла содержащегося в ZIP файле не является DB. Пожалуйста, выберете другой ZIP файл.",
-    "recovery_error_inside_db" : "DB Файл содержащийся в ZIP архиве, не является файлом восстановления EnCrypto.",
-    "recovery_error_format" : "Формат файла, который вы пытаете восстановить не является подходящим. Для восстановления нужен ZIP формат.",
-    "enter_pass_recovery" : "Введите пароль от восстанавливаемого портфолио",
-    "create_port_recovery" : "Пожалуйста, создайте портфолио",
-    "choose_port_recovery" : "Выберите портфолио для восстановления:",
-    "bio_recovery_alert" : "Желаете ли вы добавить биометрическую аутентификацию?",
-    "replace_recovery_alert" : "Вы действительно желаете заменить выбранное портфолио?",
-    "create_new_portfolio" : "Создать новое портфолио",
+    "recovery_good":
+        "Файл подходит. Будьте внимательны при проведении восстановления. Перезаписанное портфолио не будут иметь возможности восстановиться. Желаете ли вы продолжить?",
+    "recovery_error_telegram":
+        "Вы пытаетесь восстановить портфолио из приложения Telegram. Пожалуйста, скачайте желаемый файл на ваше устройство и проведите восстановление из хранилища.",
+    "recovery_error_size": "Размер ZIP файла не должен превышать 10 МБ.",
+    "recovery_error_contain":
+        "ZIP файл содержит внутри более одного файла. Пожалуйста, выберете другой ZIP файл.",
+    "recovery_error_inside":
+        "Формат файла содержащегося в ZIP файле не является DB. Пожалуйста, выберете другой ZIP файл.",
+    "recovery_error_inside_db":
+        "DB Файл содержащийся в ZIP архиве, не является файлом восстановления EnCrypto.",
+    "recovery_error_format":
+        "Формат файла, который вы пытаете восстановить не является подходящим. Для восстановления нужен ZIP формат.",
+    "enter_pass_recovery": "Введите пароль от восстанавливаемого портфолио",
+    "create_port_recovery": "Пожалуйста, создайте портфолио",
+    "choose_port_recovery": "Выберите портфолио для восстановления:",
+    "bio_recovery_alert":
+        "Желаете ли вы добавить биометрическую аутентификацию?",
+    "replace_recovery_alert":
+        "Вы действительно желаете заменить выбранное портфолио?",
+    "create_new_portfolio": "Создать новое портфолио",
     "success_change_pass": "Вы успешно изменили пароль!",
-    "coin_is_relevant" : "Монета не прошла проверку сервером, данные о стоимости берутся из базы данных и не будут обновляться автоматически. Приносим свои извинения."
-
+    "coin_is_relevant":
+        "Монета не прошла проверку сервером, данные о стоимости берутся из базы данных и не будут обновляться автоматически. Приносим свои извинения.",
+    "coin_is_relevant_internet": "Oтсутствует интернет соединение"
   };
   static const Map<String, Map<String, dynamic>> mapLocales = {
     "en": en,
